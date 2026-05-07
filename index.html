@@ -675,6 +675,18 @@
       </div>
     </div>
   </div>
+      <section class="operator-box">
+      <h3>運営会社について</h3>
+      <p>
+        本ページは、トレードログ株式会社が運営しています。
+        当社は、ブロックチェーン、データトラスト、トレーサビリティ領域における
+        システム開発・コンサルティングを行っています。
+      </p>
+      <p>
+        DPP、サプライチェーンデータ連携、製品情報管理に関する
+        調査・要件整理・実装支援に対応しています。
+      </p>
+    </section>
 </div>
 
 <!-- ===== QUIZ SCREEN ===== -->
@@ -789,8 +801,15 @@
 
       <!-- Email form -->
       <div class="email-form-wrap" id="email-form">
-        <h4>レポートをお送りします</h4>
-        <input type="email" id="email-input" placeholder="your@email.com">
+  <h4>レポートをお送りします</h4>
+
+  <p class="privacy-note">
+    入力いただいたメールアドレスは、診断レポートの送付および
+    DPP関連情報のご案内にのみ利用します。<br>
+    運営：トレードログ株式会社
+  </p>
+
+  <input type="email" id="email-input" placeholder="your@email.com">
         <button class="btn-primary" style="width:100%" onclick="submitEmail()">送信する</button>
         <div class="email-success" id="email-success" style="display:none">✓ 送信ありがとうございました</div>
       </div>
@@ -863,7 +882,24 @@
     </div>
   </div>
 </div>
-
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p><strong>運営会社：</strong>トレードログ株式会社</p>
+    <p>
+      <strong>事業内容：</strong>
+      データトラスト／トレーサビリティ／ブロックチェーン関連の
+      システム開発・コンサルティング
+    </p>
+    <p class="footer-links">
+      <a href="https://tradelog.co.jp/" target="_blank" rel="noopener">会社サイト</a>
+      <span>｜</span>
+      <a href="https://tradelog.co.jp/contact/" target="_blank" rel="noopener">お問い合わせ</a>
+      <span>｜</span>
+      <a href="https://tradelog.co.jp/privacy-policy/" target="_blank" rel="noopener">プライバシーポリシー</a>
+    </p>
+    <p class="copyright">© TradeLog, Inc.</p>
+  </div>
+</footer>
 <script>
 // ===== CONFIG =====
 // 公開前に自社Webサイトの申込URL・レポート申込先へ差し替えてください。
