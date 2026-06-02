@@ -1158,14 +1158,14 @@ questions.forEach((q, i) => {
       ? [1, 0.7, 0.3, 0][ans]
       : ratios[ans];
 
-  const score = weights[q.id] * ratio;
+  const itemScore = weights[q.id] * ratio;
 
-  total += score;
+  total += itemScore;
 
   itemScores[q.id] = score;
 });
 
-  
+  const score = Math.round(total);
 
   // Industry avg: score + random(-10 to +15), clamped 20-85, min score+2
   const industryAvgTable = {
