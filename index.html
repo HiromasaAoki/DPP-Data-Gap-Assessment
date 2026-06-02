@@ -486,7 +486,8 @@
   }
   .email-form-wrap.visible { display: block; }
   .email-form-wrap h4 { font-size: 15px; font-weight: 700; margin-bottom: 14px; }
-  .email-form-wrap input[type="email"] {
+  .email-form-wrap input[type="email"],
+  .email-form-wrap input[type="text"] {
     width: 100%;
     padding: 12px 16px;
     border: 2px solid var(--border);
@@ -497,7 +498,32 @@
     outline: none;
     transition: border-color 0.15s;
   }
+  
   .email-form-wrap input:focus { border-color: var(--accent); }
+   
+  /* Email form Report preview *
+  .report-preview {
+  margin-bottom: 20px;
+}
+
+.report-cover {
+  width: 180px;
+  display: block;
+  margin: 0 auto 12px;
+  border: 1px solid var(--border);
+}
+
+.report-title {
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 12px;
+}
+
+.report-desc {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--text-muted);
+}
   .email-success {
     text-align: center;
     color: var(--accent);
@@ -856,7 +882,7 @@
       <div class="cta-title">NEXT STEPS</div>
       <div class="cta-grid">
         <button class="cta-btn cta-btn-primary" onclick="toggleEmailForm()">
-          <span>📄 ESPR対応入門資料を受け取る</span>
+          <span>📄 無料資料｜ESPR・DPP入門ガイドを受け取る</span>
           <span class="cta-arrow">↓</span>
         </button>
         <button class="cta-btn cta-btn-secondary" onclick="showInterstitial('detail')">
@@ -872,7 +898,29 @@
       <!-- Email form -->
       <div class="email-form-wrap" id="email-form">
   <h4>ESPR入門資料をお送りします</h4>
+<div class="report-preview">
 
+  <img
+    src="images/espr-guide-cover.png"
+    alt="ESPR・DPP入門ガイド"
+    class="report-cover"
+  >
+
+  <div class="report-title">
+    ESPR・DPP入門ガイド
+  </div>
+
+  <div class="report-desc">
+    ESPRの基本構造から、対象製品、性能要件・情報要件、
+    DPP（デジタル製品パスポート）の考え方までを整理した入門資料です。<br><br>
+
+    「何がすでに決まっているのか」
+    「何が今後の委任法で具体化されるのか」
+    を切り分けながら、
+    企業が押さえるべき主要項目と初動確認ポイントをまとめています。
+  </div>
+
+</div>
   <p class="privacy-note">
     入力いただいたメールアドレスは、ESPR入門資料の送付および
     ESPR関連情報のご案内にのみ利用します。<br>
@@ -887,7 +935,23 @@
     運営：トレードログ株式会社
   </p>
 
-  <input type="email" id="email-input" placeholder="your@email.com">
+  <input
+  type="text"
+  id="company-input"
+  placeholder="会社名"
+>
+
+<input
+  type="text"
+  id="name-input"
+  placeholder="氏名"
+>
+
+<input
+  type="email"
+  id="email-input"
+  placeholder="メールアドレス"
+>
         <button class="btn-primary" style="width:100%" onclick="submitEmail()">送信する</button>
         <div class="email-success" id="email-success" style="display:none">✓ 送信ありがとうございました</div>
       </div>
@@ -1348,12 +1412,24 @@ function toggleEmailForm() {
 }
 
 function submitEmail() {
-  const email = document.getElementById('email-input').value.trim();
-  if (!email) { alert('メールアドレスを入力してください'); return; }
+  const company =
+  document.getElementById('company-input').value.trim();
 
+const name =
+  document.getElementById('name-input').value.trim();
+
+const email =
+  document.getElementById('email-input').value.trim();
+
+if (!company || !name || !email) {
+  alert('会社名・氏名・メールアドレスを入力してください');
+  return;
+}
   const { score, level, industryAvg, missing, timeline, market } = resultData;
   const payload = {
     source: 'dpp_checker',
+    company,
+    name,
     email,
     score,
     level: levelInfo[level].label,
@@ -1370,7 +1446,7 @@ function submitEmail() {
     window.open(`${CONFIG.reportRequestUrl}${sep}${params.toString()}`, '_blank');
   } else {
     const subject = encodeURIComponent('DPP Data Gap Checker 詳細レポート申込');
-    const body = encodeURIComponent(`以下のユーザーから詳細レポート申込がありました。\n\nメール: ${email}\nDPP対応率: ${score}%\n判定: ${levelInfo[level].label}\n想定同業平均: ${industryAvg}%\n不足項目: ${(missing || []).join('、') || 'なし'}\n想定準備期間: ${timeline}\nEU市場影響度: ${market ? market.label : ''}`);
+    const body = encodeURIComponent(`以下のユーザーから詳細レポート申込がありました。\n\nメール: ${email}\n会社名: ${company}\n氏名: ${name}\nDPP対応率: ${score}%\n判定: ${levelInfo[level].label}\n想定同業平均: ${industryAvg}%\n不足項目: ${(missing || []).join('、') || 'なし'}\n想定準備期間: ${timeline}\nEU市場影響度: ${market ? market.label : ''}`);
     window.location.href = `mailto:${CONFIG.reportRequestEmailTo}?subject=${subject}&body=${body}`;
   }
 
