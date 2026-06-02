@@ -976,7 +976,7 @@ const questions = [
     id: 'q1',
     text: '対象製品カテゴリを教えてください',
     scored: false,
-    options: ['繊維・アパレル', '電子機器・電気機器', '家具・生活用品', '電池・バッテリー', 'その他']
+    options: ['繊維・アパレル', '電子機器・電気機器', '家具・マットレス', 'タイヤ', '電池・バッテリー','金属・素材（鉄鋼・アルミ等）', 'その他']
   },
   {
     id: 'q2',
@@ -986,57 +986,69 @@ const questions = [
   },
   {
     id: 'q3',
-    text: 'BOM（部品表）の整備レベルはどの程度ですか？',
-    scored: true,
-    options: ['製品単位', '部品レベル', '材料レベル', '材料＋化学物質']
+    text: '貴社の立場を教えてください',
+    scored: false,
+    options: ['完成品メーカー', '部品・材料サプライヤー', '商社・流通', 'その他']
   },
   {
     id: 'q4',
-    text: '製品の材料構成の把握状況を教えてください',
+    text: 'BOM・構成情報の整備レベルはどの程度ですか？',
     scored: true,
-    options: ['不明', '主要材料のみ', '概ね把握', '証明付き']
+    options: ['製品単位のみ', '部品レベルまで', '材料レベルまで', '材料・化学物質レベルまで']
   },
   {
     id: 'q5',
-    text: 'サプライヤ数はどのくらいですか？（逆スコア）',
+    text: 'エコデザイン関連データの把握状況を教えてください',
+    scored: true,
+    options: ['未対応', '一部データを管理（PCF・含有物質・リサイクル材率等のうち一つ）', '複数の環境・循環データを管理', '  '修理・保守・耐久性を含め体系的に管理'
+']
+  },
+  {
+    id: 'q6',
+    text: '顧客・取引先からのデータ開示要求はありますか？',
+    scored: true,
+    options: ['把握していない／特にない', 'PCF・化学物質など個別要求あり', 'DPP/ESPR関連の要求が今後想定される', 'すでにDPP/ESPRを意識した要求がある']
+  },
+  {
+    id: 'q7',
+    text: '製品・工程データの管理方法を教えてください',
+    scored: true,
+    options: ['紙・現場管理中心', 'Excel・個別ファイル中心', 'ERP／PLM／MES等で管理', '複数システムが連携した統合基盤あり']
+  },
+  {
+    id: 'q8',
+    text: 'サプライヤ数はどのくらいですか？',
     scored: true,
     reverse: true,
     options: ['1〜10社', '10〜50社', '50〜100社', '100社以上']
   },
   {
-    id: 'q6',
-    text: 'サプライヤからのデータ取得方法は？',
-    scored: true,
-    options: ['取得していない', '個別に確認', 'Excelで収集', 'システム連携']
-  },
-  {
-    id: 'q7',
-    text: '製品データの管理方法を教えてください',
-    scored: true,
-    options: ['Excel管理', 'ERP', 'PLM', '統合データ基盤']
-  },
-  {
-    id: 'q8',
-    text: '製品識別子（ID）の整備状況は？',
-    scored: true,
-    options: ['識別子なし', 'SKUのみ', 'シリアルナンバーあり', 'QR/デジタルID整備済み']
-  },
-  {
     id: 'q9',
     text: 'サプライチェーントレーサビリティの範囲は？',
     scored: true,
-    options: ['トレース不可', 'Tier1まで', 'Tier2まで', '上流まで把握']
+    options: ['ほとんど追跡できない', 'Tier1まで', 'Tier2まで', '原材料・上流工程まで一定程度追跡可能']
   },
   {
     id: 'q10',
     text: 'DPP対応の社内体制はどの段階ですか？',
     scored: true,
-    options: ['未検討', '情報収集中', '検討・整理中', 'プロジェクト化済み']
+    options: ['未検討', '情報収集中', '関係部門で検討中', 'プロジェクト化・予算化済み']
   }
 ];
 
 const scoreMap = [0, 3, 7, 10];
 const reverseScoreMap = [10, 7, 3, 0];
+  const weights = {
+  q4: 20,
+  q5: 15,
+  q6: 10,
+  q7: 20,
+  q8: 10,
+  q9: 15,
+  q10: 10
+};
+
+const ratios = [0, 0.3, 0.7, 1.0];
 
 const levelInfo = {
   advanced:  { label: 'Advanced',   cls: 'level-advanced', desc: 'DPP対応の基盤が整っています。規制施行前に最終調整を進めましょう。', timeline: '3〜6ヶ月' },
@@ -1046,13 +1058,13 @@ const levelInfo = {
 };
 
 const missingLabels = {
-  q4: '材料構成データ',
-  q5: 'サプライヤ管理体制',
-  q6: 'サプライヤデータ収集',
+  q4: 'BOM・構成情報',
+  q5: 'エコデザイン関連情報',
+  q6: '顧客要求の把握',
   q7: 'データ管理基盤',
-  q8: '製品デジタルID',
+  q8: 'サプライヤ管理',
   q9: 'トレーサビリティ',
-  q10: '社内推進体制'
+  q10: '推進体制'
 };
 
 const marketImpact = [
@@ -1124,31 +1136,57 @@ function prevQuestion() {
 // ===== SCORE CALCULATION =====
 function showResults() {
   let total = 0;
-  let itemScores = {};
+let itemScores = {};
 
-  questions.forEach((q, i) => {
-    if (!q.scored) return;
-    const ans = answers[i];
-    if (ans === null) return;
-    const pts = q.reverse ? reverseScoreMap[ans] : scoreMap[ans];
-    total += pts;
-    itemScores[q.id] = pts;
-  });
+questions.forEach((q, i) => {
 
-  const maxScore = questions.filter(q => q.scored).length * 10;
-  const score = Math.round((total / maxScore) * 100);
+  if (!q.scored) return;
+
+  const ans = answers[i];
+
+  if (ans === null) return;
+
+  const ratio =
+    q.reverse
+      ? [1, 0.7, 0.3, 0][ans]
+      : ratios[ans];
+
+  const score = weights[q.id] * ratio;
+
+  total += score;
+
+  itemScores[q.id] = score;
+});
+
+  
 
   // Industry avg: score + random(-10 to +15), clamped 20-85, min score+2
+  const industryAvgTable = {
+  '繊維・アパレル': 48,
+  '電子機器・電気機器': 58,
+  '家具・マットレス': 42,
+  'タイヤ': 55,
+  '電池・バッテリー': 68,
+  '金属・素材（鉄鋼・アルミ等）': 45,
+  'その他': 50
+};
   let avgRaw = score + Math.round(Math.random() * 25 - 10);
-  let industryAvg = Math.min(85, Math.max(20, avgRaw));
+  const category = answers[0];
+  const categoryName = questions[0].options[category];
+  const industryAvg =
+  industryAvgTable[categoryName] || 50;
   if (industryAvg <= score) industryAvg = Math.min(85, score + Math.floor(Math.random() * 8 + 3));
 
   // Level
   let level;
-  if (score >= 80) level = 'advanced';
-  else if (score >= 60) level = 'preparing';
-  else if (score >= 40) level = 'early';
-  else level = 'high';
+  if (score >= 75)
+  level = 'advanced';
+else if (score >= 50)
+  level = 'preparing';
+else if (score >= 25)
+  level = 'early';
+else
+  level = 'high';
 
   // Missing items (score 0-3)
   const missing = Object.entries(itemScores)
@@ -1156,8 +1194,19 @@ function showResults() {
     .map(([id]) => missingLabels[id]);
 
   const market = marketImpact[answers[1]] || marketImpact[2];
-  resultData = { score, industryAvg, level, missing, timeline: levelInfo[level].timeline, market }; 
+  const category = questions[0].options[answers[0]];
+  const companyType = questions[2].options[answers[2]];
+  resultData = {
+    score,
+    industryAvg,
+    level,
+    missing,
+    timeline: levelInfo[level].timeline,
 
+    market,
+    category,
+    companyType
+  };
   renderResult(resultData);
   showScreen('result');
 }
@@ -1225,11 +1274,17 @@ function renderResult({ score, industryAvg, level, missing, timeline }) {
     document.getElementById('market-impact-value').textContent = resultData.market.label;
     document.getElementById('market-impact-desc').textContent = resultData.market.desc;
   }
+  // Category
+  document.getElementById('category-value').textContent =
+  resultData.category || '-';
+  // Company Type
+  document.getElementById('company-type-value').textContent =
+  resultData.companyType || '-';
 }
 
 // ===== INTERSTITIAL =====
 function buildRecap(id) {
-  const { score, industryAvg, level, missing, timeline, market } = resultData;
+  const { score, industryAvg, level, missing, timeline, market, category, companyType } = resultData;
   const info = levelInfo[level];
   const missingStr = missing.length > 0 ? missing.join('、') : 'なし';
   return `
@@ -1239,6 +1294,8 @@ function buildRecap(id) {
       <div><div class="recap-item-label">判定</div><div class="recap-item-value">${info.label}</div></div>
       <div><div class="recap-item-label">想定同業平均</div><div class="recap-item-value">${industryAvg}%</div></div>
       <div><div class="recap-item-label">想定準備期間</div><div class="recap-item-value">${timeline}</div></div>
+      <div><div class="recap-item-label">対象カテゴリ</div><div class="recap-item-value">${category}</div></div>
+      <div><div class="recap-item-label">企業区分</div><div class="recap-item-value">${companyType}</div></div>
       <div><div class="recap-item-label">EU市場影響度</div><div class="recap-item-value">${market ? market.label : '-'}</div></div>
     </div>
     <div style="margin-top:12px;font-size:13px;color:var(--text-muted)">主な不足項目：${missingStr}</div>
