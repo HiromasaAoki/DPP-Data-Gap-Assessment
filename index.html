@@ -1178,7 +1178,7 @@ questions.forEach((q, i) => {
   'その他': 50
 };
   let avgRaw = score + Math.round(Math.random() * 25 - 10);
-  const category = answers[0];
+  const category = questions[0].options[answers[0]];
   const categoryName = questions[0].options[category];
   const industryAvg =
   industryAvgTable[categoryName] || 50;
@@ -1201,7 +1201,6 @@ else
     .map(([id]) => missingLabels[id]);
 
   const market = marketImpact[answers[1]] || marketImpact[2];
-  const category = questions[0].options[answers[0]];
   const companyType = questions[2].options[answers[2]];
   resultData = {
     score,
