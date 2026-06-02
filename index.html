@@ -1177,13 +1177,11 @@ questions.forEach((q, i) => {
   '金属・素材（鉄鋼・アルミ等）': 45,
   'その他': 50
 };
-  let avgRaw = score + Math.round(Math.random() * 25 - 10);
-  const category = questions[0].options[answers[0]];
-  const categoryName = questions[0].options[category];
-  const industryAvg =
-  industryAvgTable[categoryName] || 50;
-  if (industryAvg <= score) industryAvg = Math.min(85, score + Math.floor(Math.random() * 8 + 3));
+ const category =
+  questions[0].options[answers[0]];
 
+const industryAvg =
+  industryAvgTable[category] || 50;
   // Level
   let level;
   if (score >= 75)
